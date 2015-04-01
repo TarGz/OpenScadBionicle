@@ -1,0 +1,3 @@
+[submodule "MyOpenScadLibs"]
+	path = MyOpenScadLibs
+	url = https://github.com/TarGz/MyOpenScadLibs.git
