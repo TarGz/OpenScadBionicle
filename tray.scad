@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-
+include <MyOpenScadLibs/round/cube.scad>;
 
 ballDiam = 10.2;
 armDiam = 4.7;
@@ -72,7 +72,7 @@ module trayBox(){
     }  
 }
 
-module traySideExtrude(){
+module traySideExtrudeOld(){
             
     minkowski(){
         hull(){
@@ -86,6 +86,15 @@ module traySideExtrude(){
         rotate([90,0,90]) cylinder(r=1,h=1);
     }    
 
+}
+
+
+
+module traySideExtrude(){
+    
+    translate([2,0,0]) rotate([90,0,0]) cubeRound([50,20,50],8,true,20);
+   
+   
 }
 
 module tray(){
@@ -118,8 +127,9 @@ module ball(l){
 
 tray();
 translate([trayX/2,-armLength-boxY,trayZ/2+1.32]) rotate([90,0,0]) ball(armLength);
-*trayHole();
+trayHole();
 
+//!traySideExtrude();
 
 
 
