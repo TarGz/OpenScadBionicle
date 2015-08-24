@@ -24,28 +24,32 @@ SOFTWARE.
 
 include <MyOpenScadLibs/round/cube.scad>;
 
+// general
 ballDiam = 10.2;
 armDiam = 4.7;
-armLength = 8;
+armLength = 15; // default 8
 trayMainDiam = 8.4;
 traySmallDiam = 4.3;
 
+// Tray
 trayX = 15.8;
 trayY = 11;
 trayZ = 7.5;
 trayRad = 5;
 trayCurve = 3.4;
 
-
+// Box
 boxX = 8;
 boxY = 4;
 boxZ = trayZ;
 boxRadius = 1;
+sideExtrudeHeight=4;
+
 
 $fn=50;
 
 module trayMainDiamExtruder(delta){
-    translate([trayX/2,8+delta,trayZ/2]) sphere(r=ballDiam/2);
+    translate([7,6+delta,trayZ/2]) sphere(r=(ballDiam/2));
 }
 // Tray hole
 module trayHole(){
@@ -56,7 +60,7 @@ module trayHole(){
         trayMainDiamExtruder(2);
         trayMainDiamExtruder(3);
         trayMainDiamExtruder(4);
-        translate([trayX/2,8,trayZ/2]) rotate([0,90,0]) cylinder(r=traySmallDiam/2,h=trayX+2,center=true);
+        translate([(trayX/2)/1.1,6,trayZ/2]) rotate([0,90,0]) cylinder(r=(traySmallDiam/2),h=trayX+2,center=true);
     }
 }
 module trayCurve(){
@@ -64,72 +68,60 @@ module trayCurve(){
     *translate([0,0,-1]) cylinder(r=trayCurve,h=trayZ+2);
     *translate([trayX,0,-1]) cylinder(r=trayCurve,h=trayZ+2);
 }
-module trayBox(){
-
-    translate([(trayX - boxX + boxRadius)/2,-4,0]) minkowski(){
-        cube([boxX-boxRadius,boxY,boxZ-boxRadius]);
-        cylinder(r=boxRadius,h=1);
-    }  
+module trayBox(){ 
+    translate([(trayX - boxX + boxRadius)/2,-4,1])  cubeRound([boxX,boxY+5,boxZ],boxRadius,false,20); 
 }
-
-module traySideExtrudeOld(){
-            
-    minkowski(){
-        hull(){
-            translate([-1,5,trayZ/2]){
-                cube([1,7,4],center=true);
-                translate([0,2.5,0]) rotate([0,90,0]) cylinder(r=2,h=1,center=true);
-            }
-            translate([2,-2,trayZ/2]) cube([7,1,4],center=true);
-            //#translate([-5,8,trayZ/2]) cube([1,7,trayZ/2],center=true);
-        }
-        rotate([90,0,90]) cylinder(r=1,h=1);
-    }    
-
-}
-
 
 
 module traySideExtrude(){
-    
-    translate([2,0,0]) rotate([90,0,0]) cubeRound([50,20,50],8,true,20);
-   
-   
+    translate([-4,3,trayZ/2]) cubeRound([10,12,traySmallDiam],2,true,8);
+    translate([2,-2,trayZ/2]) cubeRound([8,5,traySmallDiam],2,true,8);
 }
-
-module tray(){
+module ball(l){
+    translate([0,0.2,(ballDiam/2)]) sphere(r=ballDiam/2);
+    translate([0,0.2,-l]) cylinder(r=4.7/2,h=l+ballDiam/2);
+    // Support for adhesion
+    translate([0,-(ballDiam/2)+0.2,ballDiam/2]) rotate([90,0,0]) cylinder(h = .2, r=ballDiam/2);
+}
+module defaultTray(armL){
     difference(){
         difference(){
             difference(){
-                hull(){
+                union(){
                     trayBox(); 
                     difference(){
-                        cube([trayX,trayY,trayZ]);   
-                        trayCurve();
+                        //cube([trayX,trayY,trayZ]);  
+                        translate([0,0,1]) cubeRound([trayX,trayY,trayZ],1,false,20); 
+                        //trayCurve();
                     }
                 }
                 // Side extrude
                 union(){
                     traySideExtrude();
-                    mirror([1,0,0]) translate([-16,0,0]) traySideExtrude();
+                    mirror([1,0,0]) translate([-13.8,0,0]) traySideExtrude();
                 }
             }
             trayHole();
         }
     }
+    translate([(trayX/2)-.5,-armL-boxY,trayZ/2+1.32]) rotate([90,0,0]) ball(armL);
 }
 
-module ball(l){
-    //translate([trayX/2,armLength,trayZ/2])
-    translate([0,0,ballDiam/2]) sphere(r=ballDiam/2);
-    translate([0,0,-l]) cylinder(r=4.7/2,h=l+ballDiam/2);
-}
 
-tray();
-translate([trayX/2,-armLength-boxY,trayZ/2+1.32]) rotate([90,0,0]) ball(armLength);
-trayHole();
+
+defaultTray(armLength);
+
+
+
+*translate([0,26,-1]) tray(armLength);
+//trayHole();
 
 //!traySideExtrude();
+
+*translate([15,-22,0]) rotate([0,0,90]) cube([32.7,15.44,10.26],center=false);
+
+
+
 
 
 
